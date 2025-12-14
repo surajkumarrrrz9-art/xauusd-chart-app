@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>XAUUSD Chart</title>
+
+  <!-- TradingView Lightweight Charts -->
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #0e1117;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    #toolbar {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 100;
+      background: rgba(20,20,20,0.8);
+      padding: 8px;
+      border-radius: 6px;
+    }
+
+    #toolbar select, #toolbar button {
+      margin: 2px;
+      padding: 4px 6px;
+      background: #1e222d;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 4px;
+    }
+
+    #chart {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="toolbar">
+  <select id="tf" onchange="loadData()">
+    <option value="1m">1m</option>
+    <option value="5m">5m</option>
+    <option value="15m">15m</option>
+    <option value="1h">1H</option>
+    <option value="4h">4H</option>
+  </select>
+
+  <button onclick="fullscreen()">Fullscreen</button>
+</div>
+
+<div id="chart"></div>
+
+<script>
+  const BACKEND_URL = "https://xauusd-chart-app.onrender.com";
+
+  const chart = LightweightCharts.createChart(
+    document.getElementById("chart"),
+    {
+      layout: {
+        background: { color: "#0e1117" },
+        textColor: "#d1d4dc"
+      },
+      grid: {
+        vertLines: { color: "#2a2e39" },
+        horzLines: { color: "#2a2e39" }
+      },
+      rightPriceScale: {
+        visible: true,
+        borderVisible: true
+      },
+      timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+        rightBarStaysOnScroll: true
+      },
+      handleScroll: {
+        mouseWheel: true,
+        pressedMouseMove: true,
+        horzTouchDrag: true,
+        vertTouchDrag: true
+      },
+      handleScale: {
+        mouseWheel: true,
+        pinch: true,
+        axisPressedMouseMove: true
+      },
+      crosshair: {
+        mode: 1
+      }
+    }
+  );
+
+  const series = chart.addCandlestickSeries({
+    upColor: "#00ff6a",
+    downColor: "#ff3b3b",
+    wickUpColor: "#00ff6a",
+    wickDownColor: "#ff3b3b",
+    borderVisible: false
+  });
+
+  async function loadData() {
+    const tf = document.getElementById("tf").value;
+    const url = `${BACKEND_URL}/candles?tf=${tf}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    series.setData(data);
+    chart.timeScale().fitContent();
+  }
+
+  function fullscreen() {
+    document.documentElement.requestFullscreen();
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>
