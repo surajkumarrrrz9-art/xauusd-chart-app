@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>XAUUSD</title>
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body style="margin:0;background:#0e1117">
+
+<select id="tf" onchange="load()"> 
+  <option>1m</option><option>5m</option><option>15m</option>
+  <option>1h</option><option>4h</option>
+</select>
+
+<div id="chart" style="height:100vh"></div>
+
+<script>
+const chart = LightweightCharts.createChart(document.getElementById("chart"), {
+  rightPriceScale:{visible:true},
+  handleScale:{pinch:true},
+  handleScroll:{pinch:true}
+});
+
+const s = chart.addCandlestickSeries({
+  upColor:"#00ff6a",
+  downColor:"#ff3b3b"
+});
+
+async function load(){
+  const tf = document.getElementById("tf").value;
+  const r = await fetch("YOUR_RENDER_URL/candles?tf="+tf);
+  s.setData(await r.json());
+}
+load();
+</script>
+</body>
+</html>
